@@ -1,0 +1,55 @@
+[package]
+name = "config-kit"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+description = "Layered typed configuration for Rust — file → env → overrides with unknown-field denial, secret redaction, and hot reload"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/WyattAu/config-kit"
+keywords = ["config", "configuration", "settings", "env", "serde"]
+categories = ["config"]
+exclude = [".github/", "benches/"]
+
+[features]
+default = []
+json = ["dep:serde_json"]
+yaml = ["dep:serde_yaml_ng"]
+# Opt-in `Serialize` for `Sensitive<T>` (deserialization is always
+# available — loading configuration is the point; serializing secrets is
+# the risky direction).
+serde = []
+hot-reload = ["dep:notify"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_ignored = "0.1"
+thiserror = "2"
+toml = "1"
+serde_json = { version = "1", optional = true }
+serde_yaml_ng = { version = "0.10", optional = true }
+notify = { version = "8", optional = true }
+
+[dev-dependencies]
+criterion = "0.7"
+tempfile = "3"
+
+[[bench]]
+name = "loader_bench"
+harness = false
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_docs = "deny"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+indexing_slicing = "deny"
+undocumented_unsafe_blocks = "deny"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"
