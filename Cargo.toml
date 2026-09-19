@@ -1,6 +1,6 @@
 [package]
 name = "config-kit"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 rust-version = "1.85"
 description = "Layered typed configuration for Rust — file → env → overrides with unknown-field denial, secret redaction, and hot reload"
@@ -23,6 +23,7 @@ hot-reload = ["dep:notify"]
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_ignored = "0.1"
+serde_path_to_error = "0.1"
 thiserror = "2"
 toml = "1"
 serde_json = { version = "1", optional = true }

@@ -29,10 +29,16 @@ pub enum ConfigError {
     ///   (`json`, `yaml`),
     /// - the merged configuration did not deserialize into the target type.
     ///
-    /// `path` is the file involved; for a merge/deserialization mismatch it
-    /// is the most recently read file layer (or empty when no file layer
-    /// contributed, e.g. a type mismatch introduced by env or overrides
-    /// alone).
+    /// `path` names where the failure happened. For a file parse failure it
+    /// is the file involved. For a merge/deserialization mismatch it is the
+    /// origin of the offending **value**: the file that supplied it,
+    /// `<env:VARIABLE>` for a value supplied by an environment layer (the
+    /// full, pre-strip variable name), or `<overrides>` for the in-process
+    /// override layer — so a deployment's bad environment variable is
+    /// reported as itself, not as the file it happened to override. The
+    /// path is empty when nothing more specific applies (no file layer
+    /// contributed and the failing value's layer could not be determined);
+    /// Display renders the empty path as `(merged)`.
     #[error("failed to parse config file {}: {source}", Self::parse_path(path))]
     Parse {
         /// The file involved, or empty for a non-file deserialization

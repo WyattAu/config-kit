@@ -13,11 +13,89 @@ struct Service {
     port: u16,
 }
 
+#[derive(Deserialize, Debug)]
+#[allow(dead_code)] // fields are consumed by serde, not read directly
+struct OnlyPort {
+    port: u16,
+}
+
 fn overrides(pairs: &[(&str, toml::Value)]) -> BTreeMap<String, toml::Value> {
     pairs
         .iter()
         .map(|(key, value)| ((*key).to_owned(), value.clone()))
         .collect()
+}
+
+#[test]
+fn env_type_mismatch_is_attributed_to_the_env_var() {
+    // Regression (estate-integration round 3): a value supplied by an
+    // env layer that fails to type-check used to be reported against the
+    // last FILE layer read. The error must name the variable itself.
+    let prefix = "CKIT_ATTR_ENV_";
+    std::env::set_var(format!("{prefix}PORT"), "not-a-number");
+
+    let dir = tempfile::tempdir().expect("tempdir");
+    let path = dir.path().join("base.toml");
+    std::fs::write(&path, "port = 1\n").expect("write");
+
+    let error = ConfigBuilder::new()
+        .layer(ConfigLayer::file(&path)) // last file layer read...
+        .layer(ConfigLayer::env_prefix(prefix)) // ...but the bad value is ours
+        .load::<OnlyPort>()
+        .expect_err("string port cannot deserialize into u16");
+
+    let rendered = error.to_string();
+    assert!(
+        rendered.contains(&format!("<env:{prefix}PORT>")),
+        "error must name the environment variable, got: {rendered}"
+    );
+    assert!(
+        !rendered.contains("base.toml"),
+        "the file that was overridden must not be blamed: {rendered}"
+    );
+    std::env::remove_var(format!("{prefix}PORT"));
+}
+
+#[test]
+fn file_type_mismatch_is_attributed_to_its_file() {
+    // Symmetry: with no overriding layer, a bad file value names the file
+    // — and not a later, unrelated file layer.
+    let dir = tempfile::tempdir().expect("tempdir");
+    let base = dir.path().join("base.toml");
+    std::fs::write(&base, "port = \"not-a-number\"\n").expect("write");
+    let other = dir.path().join("other.toml");
+    std::fs::write(&other, "region = \"eu\"\n").expect("write");
+
+    let error = ConfigBuilder::new()
+        .layer(ConfigLayer::file(&base)) // carries the bad value
+        .layer(ConfigLayer::file(&other)) // read last — must NOT be blamed
+        .load::<Service>()
+        .expect_err("string port cannot deserialize into u16");
+
+    let rendered = error.to_string();
+    assert!(rendered.contains("base.toml"), "got: {rendered}");
+    assert!(!rendered.contains("other.toml"), "got: {rendered}");
+}
+
+#[test]
+fn override_type_mismatch_is_attributed_to_overrides() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let path = dir.path().join("base.toml");
+    std::fs::write(&path, "port = 1\n").expect("write");
+
+    let error = ConfigBuilder::new()
+        .layer(ConfigLayer::file(&path))
+        .layer(ConfigLayer::overrides(overrides(&[(
+            "port",
+            toml::Value::String("not-a-number".into()),
+        )])))
+        .load::<OnlyPort>()
+        .expect_err("string port cannot deserialize into u16");
+
+    assert!(
+        error.to_string().contains("<overrides>"),
+        "error must name the overrides layer, got: {error}"
+    );
 }
 
 #[test]
@@ -237,7 +315,9 @@ fn strict_denial_covers_env_and_override_keys() {
         .load_strict::<StrictSettings>()
         .expect_err("override replaces the db table");
     assert!(matches!(error, ConfigError::Parse { .. }), "{error}");
-    assert!(error.to_string().contains("(merged)"));
+    // 0.1.1: the offending value's layer is attributed — `<overrides>`
+    // here, where 0.1.0 fell back to `(merged)`.
+    assert!(error.to_string().contains("<overrides>"));
     std::env::remove_var(format!("{prefix}DB_URL"));
     std::env::remove_var(format!("{prefix}DB_PORT"));
     std::env::remove_var(format!("{prefix}SURPLUS"));
