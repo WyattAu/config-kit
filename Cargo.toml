@@ -31,7 +31,7 @@ serde_yaml_ng = { version = "0.10", optional = true }
 notify = { version = "8", optional = true }
 
 [dev-dependencies]
-criterion = "0.7"
+criterion = "0.8"
 tempfile = "3"
 
 [[bench]]
