@@ -1,4 +1,7 @@
 
 # cargo-vet audits file
 
-[audits]
+[[audits.config-kit]]
+criteria = "safe-to-deploy"
+version = "0.1.1"
+notes = "WyattAu first-party crate; 0.1.1 attributes env-layer override provenance correctly — reviewed as the original in-tree implementation."
