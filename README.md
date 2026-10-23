@@ -1,4 +1,5 @@
 # config-kit
+[![Estate integration](https://github.com/WyattAu/estate-integration/actions/workflows/ci.yml/badge.svg)](https://github.com/WyattAu/estate-integration/actions/workflows/ci.yml)
 
 Layered typed configuration for Rust — the shared config pattern of the
 WyattAu estate: **file → env → overrides**, deep-merged into serde structs,
