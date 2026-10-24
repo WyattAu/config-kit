@@ -1,6 +1,6 @@
 [package]
 name = "config-kit"
-version = "0.1.2"
+version = "1.0.0"
 edition = "2021"
 rust-version = "1.85"
 description = "Layered typed configuration for Rust: file → env → overrides with unknown-field denial, secret redaction, and hot reload"

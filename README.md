@@ -124,6 +124,14 @@ your README per the estate standard.
 | `serde` | no | opt-in `Serialize` for `Sensitive<T>` (deserialization always available) |
 | `hot-reload` | no | `watch(path, handler)` + `ConfigWatcher` via `notify` |
 
+## Stability
+
+`config-kit` is 1.0. Breaking changes require a minor bump and a `#[deprecated]`
+window of at least one minor release; MSRV bumps are minor releases, never patch
+releases. Layer precedence (file, then env, then overrides) is guaranteed. New
+built-in sources may arrive in minors behind features; reload debounce timing is
+best-effort and may be tuned.
+
 ## License
 
 Licensed under either of [Apache-2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT)
