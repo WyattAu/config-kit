@@ -1,7 +1,7 @@
 # config-kit
 [![Estate integration](https://github.com/WyattAu/estate-integration/actions/workflows/ci.yml/badge.svg)](https://github.com/WyattAu/estate-integration/actions/workflows/ci.yml)
 
-Layered typed configuration for Rust — the shared config pattern of the
+Layered typed configuration for Rust; the shared config pattern of the
 WyattAu estate: **file → env → overrides**, deep-merged into serde structs,
 with top-level unknown-key denial, redacted secrets, and opt-in hot reload.
 
@@ -10,8 +10,8 @@ with top-level unknown-key denial, redacted secrets, and opt-in hot reload.
   order added, so later layers win on collisions without clobbering
   siblings.
 - **Strict mode without derives**: `load_strict` denies unknown
-  **top-level** keys for *any* `DeserializeOwned` type — no
-  `#[serde(deny_unknown_fields)]` per-struct ceremony — and reports the
+  **top-level** keys for *any* `DeserializeOwned` type; no
+  `#[serde(deny_unknown_fields)]` per-struct ceremony; and reports the
   offending keys in a typed error.
 - **Secrets redacted by construction**: `Sensitive<T>` renders
   `"[REDACTED]"` for `Debug` *and* `Display`, with bound-free impls so
@@ -22,7 +22,7 @@ with top-level unknown-key denial, redacted secrets, and opt-in hot reload.
 - **Hot reload (opt-in)**: `notify`-backed, 300 ms debounced, typed
   callbacks; reload failures are recorded, never panics.
 - **`#![forbid(unsafe_code)]`, `#![deny(missing_docs)]`**, clippy
-  `unwrap_used`/`expect_used`/`panic`/`indexing_slicing` denied — the
+  `unwrap_used`/`expect_used`/`panic`/`indexing_slicing` denied; the
   public surface is fallible and typed.
 
 ## Install
@@ -76,7 +76,7 @@ let error = ConfigBuilder::new()
 
 The precise contract: detection is container-agnostic (it works for any
 `DeserializeOwned` type by observing which top-level keys serde actually
-consumed), it covers keys from *all* layers — file, env, and overrides —
+consumed), it covers keys from *all* layers; file, env, and overrides -
 and it is **top level only**: unknown keys nested inside tables are
 serde's business, and `#[serde(flatten)]` fields are exempt (flattening
 swallows the evidence before the check can see it).
@@ -111,7 +111,7 @@ full merge-and-deserialize pipeline; Linux x86_64, rustc stable):
 
 Loading is a cold-path operation: one file read + parse per file layer, one
 `vars_os` sweep per env layer, and a single serde pass over the merged
-table. `Sensitive<T>` adds zero runtime cost to non-formatting paths —
+table. `Sensitive<T>` adds zero runtime cost to non-formatting paths -
 redaction is a constant string write. Publish your measured numbers in
 your README per the estate standard.
 

@@ -30,7 +30,7 @@ unknown-field denial, secret redaction, and hot reload surfaces as API-stable.
 
 - **Parse errors now name the layer that supplied the offending value.**
   When an env-provided value failed to type-check, the
-  `ConfigError::Parse` error cited the last **file** layer read — e.g. a
+  `ConfigError::Parse` error cited the last **file** layer read; e.g. a
   deployment setting `APP_PORT=not-a-number` was reported as a parse
   failure of `app.toml`, sending operators to debug the wrong artifact.
   The layered merge now tracks per-value provenance (which layer last
@@ -39,13 +39,13 @@ unknown-field denial, secret redaction, and hot reload surfaces as API-stable.
   - a value from an environment layer is reported as `<env:VARIABLE>`
     (the full, pre-strip variable name),
   - a value from the overrides layer as `<overrides>`,
-  - a value from a file layer as that file's path — now the file that
+  - a value from a file layer as that file's path; now the file that
     actually supplied the bad value, not merely the most recently read
     one,
   - falling back to the previous behavior (last file layer, `(merged)`
     when none) when the failing location cannot be resolved.
   Strict (`load_strict`) loads attribute identically. Message format is
-  unchanged (`failed to parse config file {location}: {source}`) — only
+  unchanged (`failed to parse config file {location}: {source}`); only
   the location is more precise.
 
 ### Added
@@ -71,12 +71,12 @@ unknown-field denial, secret redaction, and hot reload surfaces as API-stable.
   `serde` feature.
 - Typed env layers: prefix-stripped, lowercased keys with value type
   inference (bool/int/float/string).
-- `hot-reload` feature: `watch(path, handler)` — `notify`-backed, 300 ms
+- `hot-reload` feature: `watch(path, handler)`; `notify`-backed, 300 ms
   debounce, `Box<dyn Fn(T) + Send + Sync>` callback, reload failures
   recorded (never panicking) and retrievable via
   `ConfigWatcher::last_error`; `stop()` joins the worker.
 - `ConfigError`: `Io`, `Parse`, `UnknownFields`, `EnvVar`, `WatchFailed`,
-  `Poisoned` — `#[non_exhaustive]`, every variant's producer documented.
+  `Poisoned`; `#[non_exhaustive]`, every variant's producer documented.
 - Criterion benches (`layer_merge_3x20`, `env_parse_20`), layering /
   strictness / redaction / env-typing / error-variant integration tests,
   hot-reload callback tests behind the feature.
