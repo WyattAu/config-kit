@@ -88,22 +88,6 @@ criteria = "safe-to-run"
 version = "4.1.0"
 criteria = "safe-to-deploy"
 
-[[exemptions.futures-core]]
-version = "0.3.34"
-criteria = "safe-to-run"
-
-[[exemptions.futures-task]]
-version = "0.3.34"
-criteria = "safe-to-run"
-
-[[exemptions.futures-util]]
-version = "0.3.34"
-criteria = "safe-to-run"
-
-[[exemptions.getrandom]]
-version = "0.4.3"
-criteria = "safe-to-run"
-
 [[exemptions.half]]
 version = "2.7.1"
 criteria = "safe-to-run"
